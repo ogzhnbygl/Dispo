@@ -9,10 +9,10 @@ export const REMOVAL_REASONS = [
         id: 'EXP',
         label: '1. KATEGORİ: Deneysel Nedenler (EXP)',
         options: [
-            { code: 'EXP-01', label: 'EXP-01: Proje Sonu Sakrifikasyon (Scheduled Sacrifice)', description: 'Deney protokolü gereği belirlenen günde yapılan sonlandırma.' },
-            { code: 'EXP-02', label: 'EXP-02: Doku/Organ Temini (Tissue Harvest)', description: 'Canlı bir deney protokolü olmaksızın, sadece ex vivo çalışmalar için doku almak amacıyla yapılan sonlandırma.' },
-            { code: 'EXP-03', label: 'EXP-03: İnsani Sonlandırma Noktası (Humane Endpoint - Deneysel)', description: 'Deney süresince hayvanın ağrı/stres skoru belirlenen limitleri aştığı için, proje tamamlanmadan etik gereği yapılan ötenazi.' },
-            { code: 'EXP-04', label: 'EXP-04: Pilot Çalışma Sonlandırması', description: 'Ana deney öncesi doz/yöntem belirleme çalışmaları sonucu çıkarma.' }
+            { code: 'EXP-01', label: 'EXP-01: Proje Sonu Sakrifikasyon (Scheduled Sacrifice)', description: 'Deney protokolü gereği belirlenen günde yapılan sonlandırma.', requiresProject: true },
+            { code: 'EXP-02', label: 'EXP-02: Doku/Organ Temini (Tissue Harvest)', description: 'Canlı bir deney protokolü olmaksızın, sadece ex vivo çalışmalar için doku almak amacıyla yapılan sonlandırma.', requiresProject: true },
+            { code: 'EXP-03', label: 'EXP-03: İnsani Sonlandırma Noktası (Humane Endpoint - Deneysel)', description: 'Deney süresince hayvanın ağrı/stres skoru belirlenen limitleri aştığı için, proje tamamlanmadan etik gereği yapılan ötenazi.', requiresProject: true },
+            { code: 'EXP-04', label: 'EXP-04: Pilot Çalışma Sonlandırması', description: 'Ana deney öncesi doz/yöntem belirleme çalışmaları sonucu çıkarma.', requiresProject: true }
         ]
     },
     {
@@ -42,7 +42,7 @@ export const REMOVAL_REASONS = [
         label: '4. KATEGORİ: Spontan Ölümler (MORT)',
         options: [
             { code: 'MORT-01', label: 'MORT-01: Doğal Ölüm/Eksitus (Found Dead)', description: 'Sabah kontrolünde kafeste ölü bulunan, nedeni bilinmeyen veya yaşlılığa bağlı ölümler.' },
-            { code: 'MORT-02', label: 'MORT-02: Anestezi/Cerrahi Kaybı (Periprocedural Death)', description: 'Deney sırasında anestezi komplikasyonu veya cerrahi esnasında masada kalma durumu.' },
+            { code: 'MORT-02', label: 'MORT-02: Anestezi/Cerrahi Kaybı (Periprocedural Death)', description: 'Deney sırasında anestezi komplikasyonu veya cerrahi esnasında masada kalma durumu.', requiresProject: true },
             { code: 'MORT-03', label: 'MORT-03: Kanibalizm', description: 'Ebeveyn veya kafes arkadaşları tarafından yenmiş/parçalanmış olarak bulunma.' }
         ]
     },

@@ -39,8 +39,17 @@ export function EntryForm({ onRecordAdded }) {
     const handleReasonChange = (e) => {
         const code = e.target.value;
         setSelectedReason(code);
-        // Show project field only for Experimental reasons (starting with EXP)
-        setShowProject(code.startsWith('EXP'));
+
+        // Find the selected option to check if it requires a project
+        let requiresProject = false;
+        for (const category of REMOVAL_REASONS) {
+            const option = category.options.find(opt => opt.code === code);
+            if (option && option.requiresProject) {
+                requiresProject = true;
+                break;
+            }
+        }
+        setShowProject(requiresProject);
     };
 
     // Helper to get description for selected reason
