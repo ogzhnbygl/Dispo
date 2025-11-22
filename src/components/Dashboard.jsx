@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StatsCard } from './StatsCard';
+import { DashboardChart } from './DashboardChart';
 import { Loader2 } from 'lucide-react';
 
 export function Dashboard() {
@@ -64,10 +65,8 @@ export function Dashboard() {
                 />
             </div>
 
-            {/* Placeholder for future charts */}
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 text-center text-slate-400">
-                <p>Grafikler ve detaylı tablolar yakında eklenecek.</p>
-            </div>
+            {/* Monthly Trend Chart */}
+            <DashboardChart data={stats.monthlyData || []} />
         </div>
     );
 }
