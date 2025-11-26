@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
     try {
         const client = await clientPromise;
-        const db = client.db('LabColonyDB');
+        const db = client.db('Dispo_db');
         const collection = db.collection('animals');
 
         const now = new Date();
