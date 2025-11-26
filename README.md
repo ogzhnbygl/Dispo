@@ -23,8 +23,8 @@ Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyi
 
 1. **Projeyi klonlayın:**
    ```bash
-   git clone [repo-url]
-   cd LabColony
+   git clone https://github.com/ogzhnbygl/Dispo.git
+   cd Dispo
    ```
 
 2. **Bağımlılıkları yükleyin:**

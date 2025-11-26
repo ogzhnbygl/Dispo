@@ -11,7 +11,7 @@ export function Layout({ children, currentView, onViewChange }) {
                         <div className="bg-indigo-600 p-2 rounded-lg text-white">
                             <PawPrint size={24} />
                         </div>
-                        <h1 className="text-xl font-bold text-slate-800">LabColony Raporlama</h1>
+                        <h1 className="text-xl font-bold text-slate-800">Dispo Raporlama</h1>
                     </div>
 
                     {/* Navigation */}

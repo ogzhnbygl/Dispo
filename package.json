@@ -1,7 +1,11 @@
 {
-  "name": "lab-colony-reporting",
+  "name": "dispo",
   "private": true,
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ogzhnbygl/Dispo"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
