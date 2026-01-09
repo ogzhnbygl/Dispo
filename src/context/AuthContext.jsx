@@ -31,19 +31,28 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-            const response = await fetch('https://wildtype.app/api/auth/me', {
+            // Call our local proxy instead of external API directly
+            const response = await fetch('/api/auth/session', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include' // Important: Sends the HttpOnly cookie
+                // We still include credentials so the secure cookie is sent to OUR backend
+                credentials: 'include'
             });
 
             if (response.ok) {
                 const data = await response.json();
                 setUser(data);
+            } else if (response.status === 403) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Access Forbidden:', errorData.error);
+
+                // Show specific debug error to user/admin
+                alert(errorData.error || 'Bu uygulamaya erişim yetkiniz bulunmamaktadır.');
+                window.location.href = 'https://wildtype.app';
             } else {
-                // If 401/403 or other error, redirect to login
+                // If 401 or other error, redirect to login
                 console.warn('Authentication failed, redirecting to login...');
                 window.location.href = 'https://wildtype.app/login';
             }
