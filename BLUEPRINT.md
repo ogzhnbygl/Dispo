@@ -93,9 +93,9 @@ Projenin gelecekteki gelişim aşamaları:
 - [x] Temel dashboard istatistikleri
 - [x] Veri import/export
 
-### Faz 2: Güvenlik ve Çoklu Kullanıcı (Planlanan 🚧)
-- [ ] **Kimlik Doğrulama:** Auth0 veya NextAuth entegrasyonu.
-- [ ] **Rol Yönetimi:** Admin (tüm veriler) vs. Araştırmacı (kendi verileri).
+### Faz 2: Güvenlik ve Çoklu Kullanıcı (Kısmen Tamamlandı ✅)
+- [x] **Kimlik Doğrulama:** Ana uygulama (Apex) ile ortak oturum entegrasyonu.
+- [x] **Rol Yönetimi:** Admin ve Uygulama bazlı (Apps: ["Dispo"]) erişim kontrolü.
 - [ ] **Audit Logs:** Kimin hangi kaydı ne zaman değiştirdiğinin takibi.
 
 ### Faz 3: Gelişmiş Raporlama

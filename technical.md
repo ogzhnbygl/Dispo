@@ -51,7 +51,20 @@ Her bir doküman aşağıdaki alanlara sahiptir:
 | `project` | String | Proje kodu veya adı. |
 | `notes` | String | (Opsiyonel) Ek açıklamalar. |
 | `created_at` | Date | Kaydın oluşturulma zamanı. |
+| `created_at` | Date | Kaydın oluşturulma zamanı. |
 
+## 🔐 Kimlik Doğrulama Mimarisi
+
+Dispo, bağımsız bir kimlik doğrulama sistemi yerine ana uygulama olan **Apex (wildtype.app)** ile paylaşılan bir oturum yapısı kullanır.
+
+### Akış Şeması
+1.  **Giriş:** Kullanıcı `wildtype.app` üzerinden giriş yapar ve `interapp_session` (HttpOnly, Secure) çerezi tarayıcıya set edilir.
+2.  **Proxy:** Dispo frontend'i, kullanıcının durumunu kontrol etmek için kendi backendine (`/api/auth/session`) istek atar.
+3.  **Doğrulama (Identity):** Dispo API, gelen isteğin çerezini `wildtype.app` API'sine yönlendirerek kimliği doğrular.
+4.  **Yetkilendirme (Authorization):** Kimlik doğrulandıktan sonra, Dispo API doğrudan **`Apex_db`** veritabanına bağlanır ve `users` koleksiyonunu sorgular.
+    *   Kullanıcının `apps` listesinde `"Dispo"` var mı?
+    *   Kullanıcının `role` değeri `"admin"` mi?
+5.  **Sonuç:** Yetkili ise oturum açılır, değilse kullanıcı ana sayfaya yönlendirilir.
 ## 🔌 API Referansı
 
 Tüm API istekleri `/api` öneki ile başlar.

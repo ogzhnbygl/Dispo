@@ -16,6 +16,9 @@ Laboratuvar hayvanlarının kayıtlarını tutmak, izlemek ve raporlamak için g
 - **Veri Yönetimi:**
     - **Dışa Aktarma (Export):** Verileri JSON formatında yedekleme.
     - **İçe Aktarma (Import):** Yedeklenen verileri sisteme geri yükleme.
+- **Güvenlik ve Yetkilendirme:**
+    - **Ortak Oturum:** Ana uygulama (Apex) ile entegre, paylaşılan güvenli oturum yönetimi.
+    - **Rol Tabanlı Erişim:** Sadece yetkili kullanıcıların ve yöneticilerin erişebildiği güvenli yapı.
 - **Modern Arayüz:**
     - Responsive tasarım ile mobil ve masaüstü uyumluluğu.
     - Kullanıcı deneyimini artıran modern UI bileşenleri.
