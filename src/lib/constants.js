@@ -51,7 +51,7 @@ export const REMOVAL_REASONS = [
         label: '5. KATEGORİ: İdari ve Lojistik (ADM)',
         options: [
             { code: 'ADM-01', label: 'ADM-01: Kurum İçi Transfer', description: 'Aynı kurumda başka bir araştırıcıya veya odaya devir.' },
-            { code: 'ADM-02', label: 'ADM-02: Kurum Dışı Transfer', description: 'Başka bir üniversite veya araştırma merkezine gönderim.' },
+            { code: 'ADM-02', label: 'ADM-02: Kurum Dışı Transfer', description: 'Başka bir üniversite veya araştırma merkezine gönderim.', requiresProject: true },
             { code: 'ADM-03', label: 'ADM-03: Kayıp/Firar (Missing)', description: 'Kafeste bulunamayan (kaçış veya kaydı var ama kendisi yok) hayvanlar.' }
         ]
     }

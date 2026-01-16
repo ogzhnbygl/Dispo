@@ -268,6 +268,7 @@ export function RecordList({ records, onSearch, onDelete }) {
                                     <td className="px-5 py-4">
                                         <div className="text-slate-700">{getReasonLabel(item.reason)}</div>
                                         {item.project !== '-' && <div className="text-xs text-indigo-600 font-medium">{item.project}</div>}
+                                        {item.transferInstitution && <div className="text-xs text-amber-600 font-medium">{item.transferInstitution}</div>}
                                     </td>
                                     <td className="px-5 py-4 text-right">
                                         <button
