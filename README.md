@@ -27,24 +27,23 @@ Laboratuvar hayvanlarının kayıtlarını tutmak, izlemek ve raporlamak için g
 
 Bu proje, performans ve geliştirici deneyimi için modern web teknolojileri kullanılarak inşa edilmiştir:
 
-- **Frontend:**
-    - [React](https://react.dev/) - Kullanıcı arayüzü kütüphanesi
-    - [Vite](https://vitejs.dev/) - Hızlı build aracı
-    - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-    - [Recharts](https://recharts.org/) - Veri görselleştirme
-    - [Lucide React](https://lucide.dev/) - İkon seti
-- **Backend:**
-    - [Vercel Serverless Functions](https://vercel.com/docs/functions) - API endpoint'leri
-- **Veritabanı:**
-    - [MongoDB](https://www.mongodb.com/) - NoSQL veritabanı
+### Frontend
+- **Framework:** [React](https://react.dev/)
+- **Build Tool:** [Vite](https://vitejs.dev/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Icons:** [Lucide React](https://lucide.dev/)
+- **Visualization:** [Recharts](https://recharts.org/)
+
+### Backend
+- **Runtime:** [Vercel Serverless Functions](https://vercel.com/docs/functions)
+- **Database:** [MongoDB](https://www.mongodb.com/)
 
 ## 📦 Kurulum
 
 Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyin:
 
 ### Ön Gereksinimler
-
-- Node.js (v18 veya üzeri)
+- Node.js (v18+)
 - MongoDB veritabanı bağlantısı (URI)
 
 ### Adımlar
@@ -63,7 +62,7 @@ Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyi
 3. **Çevresel Değişkenleri Ayarlayın:**
    Kök dizinde `.env` dosyası oluşturun ve MongoDB bağlantı adresinizi ekleyin:
    ```env
-   MONGODB_URI=mongodb+srv://kullanici:sifre@cluster.mongodb.net/Dispo_db
+   MONGODB_URI=mongodb+srv://...
    ```
 
 4. **Uygulamayı başlatın:**
@@ -78,7 +77,7 @@ Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyi
 - `/api`: Backend serverless fonksiyonları.
 - `/lib`: Yardımcı kütüphaneler ve veritabanı bağlantısı.
 
-Daha detaylı teknik bilgi için [TECHNICAL.md](./technical.md) dosyasına göz atın.
+Daha detaylı teknik bilgi için [TECHNICAL.md](./TECHNICAL.md) dosyasına göz atın.
 
 ## 📜 Lisans
 

@@ -15,10 +15,8 @@ Veri akışı şu şekildedir:
 
 ## 📂 Dizin Yapısı
 
-Projenin temel dizin yapısı ve açıklamaları:
-
 ```
-/
+Dispo/
 ├── api/                # Backend API fonksiyonları
 │   ├── animals.js      # CRUD işlemleri için ana endpoint
 │   └── dashboard-stats.js # İstatistiksel veri endpoint'i
@@ -28,7 +26,7 @@ Projenin temel dizin yapısı ve açıklamaları:
 │   ├── App.jsx         # Ana uygulama bileşeni ve routing
 │   └── main.jsx        # Uygulama giriş noktası
 ├── public/             # Statik dosyalar
-└── ...config files     # Yapılandırma dosyaları (vite, tailwind, package.json vb.)
+└── package.json        # Konfigürasyon dosyaları
 ```
 
 ## 🗄️ Veritabanı Şeması
@@ -51,78 +49,31 @@ Her bir doküman aşağıdaki alanlara sahiptir:
 | `project` | String | Proje kodu veya adı. |
 | `notes` | String | (Opsiyonel) Ek açıklamalar. |
 | `created_at` | Date | Kaydın oluşturulma zamanı. |
-| `created_at` | Date | Kaydın oluşturulma zamanı. |
 
-## 🔐 Kimlik Doğrulama Mimarisi
-
-Dispo, bağımsız bir kimlik doğrulama sistemi yerine ana uygulama olan **Apex (wildtype.app)** ile paylaşılan bir oturum yapısı kullanır.
-
-### Akış Şeması
-1.  **Giriş:** Kullanıcı `wildtype.app` üzerinden giriş yapar ve `interapp_session` (HttpOnly, Secure) çerezi tarayıcıya set edilir.
-2.  **Proxy:** Dispo frontend'i, kullanıcının durumunu kontrol etmek için kendi backendine (`/api/auth/session`) istek atar.
-3.  **Doğrulama (Identity):** Dispo API, gelen isteğin çerezini `wildtype.app` API'sine yönlendirerek kimliği doğrular.
-4.  **Yetkilendirme (Authorization):** Kimlik doğrulandıktan sonra, Dispo API doğrudan **`Apex_db`** veritabanına bağlanır ve `users` koleksiyonunu sorgular.
-    *   Kullanıcının `apps` listesinde `"Dispo"` var mı?
-    *   Kullanıcının `role` değeri `"admin"` mi?
-5.  **Sonuç:** Yetkili ise oturum açılır, değilse kullanıcı ana sayfaya yönlendirilir.
 ## 🔌 API Referansı
 
 Tüm API istekleri `/api` öneki ile başlar.
 
 ### 1. Kayıtları Getir
-
 - **Endpoint:** `GET /api/animals`
 - **Açıklama:** Tüm hayvan kayıtlarını, `removalDate`'e göre yeniden eskiye sıralı olarak getirir.
-- **Yanıt:** JSON dizisi.
 
 ### 2. Yeni Kayıt Ekle
-
 - **Endpoint:** `POST /api/animals`
-- **Body:**
-  ```json
-  {
-    "removalDate": "2023-10-27",
-    "reason": "EXP-01",
-    "count": 5,
-    "species": "Mouse",
-    "strain": "C57BL/6",
-    "gender": "Male",
-    "project": "PRJ-123",
-    "notes": "Deney tamamlandı"
-  }
-  ```
-- **Yanıt:** Oluşturulan kayıt objesi (ID dahil).
+- **Body:** JSON formatında kayıt bilgileri.
 
 ### 3. Kayıt Sil
-
 - **Endpoint:** `DELETE /api/animals?id={id}`
 - **Query Param:** `id` (Silinecek kaydın ID'si)
-- **Yanıt:** `{ "success": true }`
 
 ### 4. Dashboard İstatistikleri
-
 - **Endpoint:** `GET /api/dashboard-stats`
 - **Açıklama:** Dashboard grafikleri ve kartları için özet verileri hesaplar ve döner.
-- **Yanıt:**
-  ```json
-  {
-    "year": 150, // Yıllık toplam
-    "month": 25, // Aylık toplam
-    "projectTermination": 10, // Proje sonlandırma sayısı
-    "monthlyData": [ ... ] // Grafik verileri
-  }
-  ```
 
-## 💻 Frontend Bileşenleri
+## 🔐 Kimlik Doğrulama Mimarisi
 
-### `EntryForm`
-Kullanıcıdan veri girişi alan form bileşeni. Form validasyonu ve API'ye POST isteği atma işlemlerini yönetir.
+Dispo, bağımsız bir kimlik doğrulama sistemi yerine ana uygulama olan **Apex (wildtype.app)** ile paylaşılan bir oturum yapısı kullanır.
 
-### `RecordList`
-Kayıtların listelendiği, arama ve filtreleme işlemlerinin yapıldığı bileşen. Verileri tablo formatında gösterir.
-
-### `Dashboard`
-`recharts` kütüphanesini kullanarak verileri görselleştirir. Aylık trendleri ve kullanım nedenlerini grafiklerle sunar.
-
-### `DataTransfer`
-Verilerin JSON formatında dışa aktarılmasını (backup) ve içe aktarılmasını (restore) sağlar.
+1.  **Giriş:** Kullanıcı `wildtype.app` üzerinden giriş yapar.
+2.  **Kontrol:** Dispo API, her istekte `interapp_session` çerezini doğrular.
+3.  **Yetkilendirme:** Sadece `apps` listesinde "Dispo" yetkisi olan kullanıcılar erişebilir.
