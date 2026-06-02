@@ -20,6 +20,30 @@ export function RecordList({ records, onSearch, onDelete }) {
         itemsPerPage: 50
     });
 
+    const [selectedProjectCode, setSelectedProjectCode] = useState(null);
+    const [projectDetails, setProjectDetails] = useState(null);
+    const [loadingProject, setLoadingProject] = useState(false);
+
+    const handleProjectClick = async (code) => {
+        setSelectedProjectCode(code);
+        setLoadingProject(true);
+        setProjectDetails(null);
+        try {
+            const res = await fetch(`/api/project-details?code=${encodeURIComponent(code)}`);
+            const data = await res.json();
+            if (res.ok) {
+                setProjectDetails(data);
+            } else {
+                setProjectDetails({ error: data.error || 'Proje bilgisi bulunamadı.' });
+            }
+        } catch (err) {
+            console.error('Fetch project details failed:', err);
+            setProjectDetails({ error: 'Bağlantı hatası oluştu.' });
+        } finally {
+            setLoadingProject(false);
+        }
+    };
+
     // Close popover when clicking outside
     useEffect(() => {
         function handleClickOutside(event) {
@@ -267,7 +291,14 @@ export function RecordList({ records, onSearch, onDelete }) {
                                     <td className="px-5 py-4 font-semibold text-slate-700">{item.count}</td>
                                     <td className="px-5 py-4">
                                         <div className="text-slate-700">{getReasonLabel(item.reason)}</div>
-                                        {item.project !== '-' && <div className="text-xs text-indigo-600 font-medium">{item.project}</div>}
+                                        {item.project !== '-' && (
+                                            <button 
+                                                onClick={() => handleProjectClick(item.project)}
+                                                className="text-xs text-indigo-600 font-semibold hover:text-indigo-800 hover:underline transition-colors mt-0.5 block"
+                                            >
+                                                {item.project}
+                                            </button>
+                                        )}
                                         {item.transferInstitution && <div className="text-xs text-amber-600 font-medium">{item.transferInstitution}</div>}
                                     </td>
                                     <td className="px-5 py-4 text-right">
@@ -323,6 +354,83 @@ export function RecordList({ records, onSearch, onDelete }) {
                     </button>
                 </div>
             </div>
+
+            {/* Project Details Popup */}
+            {selectedProjectCode && (
+                <div 
+                    onClick={() => { setSelectedProjectCode(null); setProjectDetails(null); }}
+                    className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300 animate-in fade-in"
+                >
+                    <div 
+                        onClick={(e) => e.stopPropagation()}
+                        className="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-md w-full p-6 space-y-4 relative overflow-hidden animate-in zoom-in-95 duration-150 text-slate-700"
+                    >
+                        {/* Accent top border */}
+                        <div className="absolute top-0 left-0 right-0 h-1.5 bg-indigo-600" />
+                        
+                        <div className="flex justify-between items-start pt-2">
+                            <div>
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 font-mono">
+                                    {selectedProjectCode}
+                                </span>
+                            </div>
+                            <button 
+                                onClick={() => { setSelectedProjectCode(null); setProjectDetails(null); }}
+                                className="text-slate-400 hover:text-slate-600 rounded-lg p-1 hover:bg-slate-50 transition-colors"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+
+                        {loadingProject ? (
+                            <div className="py-8 flex flex-col items-center justify-center gap-3">
+                                <div className="w-6 h-6 rounded-full border-2 border-indigo-500/20 border-t-indigo-600 animate-spin" />
+                                <span className="text-xs text-slate-500 font-medium">Proje detayları yükleniyor...</span>
+                            </div>
+                        ) : projectDetails?.error ? (
+                            <div className="py-4 text-center text-sm text-red-500 font-medium">
+                                {projectDetails.error}
+                            </div>
+                        ) : projectDetails ? (
+                            <div className="space-y-4">
+                                <div>
+                                    <h4 className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1">Proje Adı</h4>
+                                    <h3 className="text-sm font-bold text-slate-900 leading-snug">
+                                        {projectDetails.title}
+                                    </h3>
+                                </div>
+                                
+                                <hr className="border-slate-100" />
+
+                                <div className="space-y-2 text-xs">
+                                    <div className="flex justify-between items-center py-1 border-b border-slate-50">
+                                        <span className="text-slate-400">Yürütücü (PI):</span>
+                                        <span className="font-semibold text-slate-800">{projectDetails.pi}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-1 border-b border-slate-50">
+                                        <span className="text-slate-400">Protokol No:</span>
+                                        <span className="font-semibold text-slate-800">{projectDetails.protocol}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-1">
+                                        <span className="text-slate-400">Durum:</span>
+                                        <span className={`font-semibold px-2 py-0.5 rounded-full text-[10px] border ${
+                                            projectDetails.status === 'Active' 
+                                                ? 'bg-green-50 text-green-700 border-green-200' 
+                                                : projectDetails.status === 'Continuing'
+                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                : 'bg-slate-50 text-slate-700 border-slate-200'
+                                        }`}>
+                                            {projectDetails.status === 'Active' ? 'Aktif' : 
+                                             projectDetails.status === 'Continuing' ? 'Devam Ediyor' : 
+                                             projectDetails.status === 'Completed' ? 'Tamamlandı' : projectDetails.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : null}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
