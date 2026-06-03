@@ -1,6 +1,16 @@
 import clientPromise from '../lib/mongodb.js';
+import { verifyAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    const user = await verifyAuth(req, 'dispo');
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     if (req.method !== 'GET') {
         res.setHeader('Allow', ['GET']);
         return res.status(405).end(`Method ${req.method} Not Allowed`);
