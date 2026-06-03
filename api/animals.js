@@ -6,10 +6,13 @@ import { z } from 'zod';
 const animalPostSchema = z.object({
     species: z.string().min(1, 'Tür gereklidir.'),
     strain: z.string().min(1, 'Soy (strain) gereklidir.'),
-    project: z.string().min(1, 'Proje adı gereklidir.'),
+    sex: z.string().min(1, 'Cinsiyet gereklidir.'),
     count: z.coerce.number().int().positive('Miktar pozitif bir tam sayı olmalıdır.'),
+    dob: z.string().min(1, 'Doğum tarihi gereklidir.'),
+    removalDate: z.string().min(1, 'Çıkarılma tarihi gereklidir.'),
     reason: z.string().min(1, 'Çıkarılma nedeni gereklidir.'),
-    removalDate: z.string().min(1, 'Çıkarılma tarihi gereklidir.')
+    project: z.string().optional().default('-'),
+    transferInstitution: z.string().nullable().optional()
 });
 
 export default async function handler(req, res) {
