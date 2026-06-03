@@ -1,6 +1,16 @@
 import clientPromise from '../lib/mongodb.js';
 import { ObjectId } from 'mongodb';
 import { verifyAuth } from '../lib/auth.js';
+import { z } from 'zod';
+
+const animalPostSchema = z.object({
+    species: z.string().min(1, 'Tür gereklidir.'),
+    strain: z.string().min(1, 'Soy (strain) gereklidir.'),
+    project: z.string().min(1, 'Proje adı gereklidir.'),
+    count: z.coerce.number().int().positive('Miktar pozitif bir tam sayı olmalıdır.'),
+    reason: z.string().min(1, 'Çıkarılma nedeni gereklidir.'),
+    removalDate: z.string().min(1, 'Çıkarılma tarihi gereklidir.')
+});
 
 export default async function handler(req, res) {
     if (req.method === 'OPTIONS') {
@@ -33,9 +43,11 @@ export default async function handler(req, res) {
 
         case 'POST':
             try {
-                const newAnimal = req.body;
-                // Ensure count is integer
-                newAnimal.count = parseInt(newAnimal.count);
+                const validation = animalPostSchema.safeParse(req.body);
+                if (!validation.success) {
+                    return res.status(400).json({ error: validation.error.errors[0].message });
+                }
+                const newAnimal = validation.data;
                 const result = await collection.insertOne(newAnimal);
                 res.status(201).json({ ...newAnimal, id: result.insertedId.toString() });
             } catch (e) {

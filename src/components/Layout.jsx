@@ -1,8 +1,10 @@
 import { Rat, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { Link, useLocation } from 'react-router-dom';
 
-export function Layout({ children, currentView, onViewChange }) {
+export function Layout({ children }) {
     const { logout, user } = useAuth();
+    const location = useLocation();
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
@@ -19,24 +21,24 @@ export function Layout({ children, currentView, onViewChange }) {
                     <div className="flex items-center gap-4">
                         {/* Navigation */}
                         <nav className="flex gap-1 bg-slate-100/50 p-1 rounded-lg">
-                            <button
-                                onClick={() => onViewChange('home')}
-                                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${currentView === 'home'
+                            <Link
+                                to="/"
+                                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${location.pathname === '/'
                                     ? 'bg-white text-indigo-600 shadow-sm'
                                     : 'text-slate-500 hover:text-slate-700'
                                     }`}
                             >
                                 Ana Sayfa
-                            </button>
-                            <button
-                                onClick={() => onViewChange('dashboard')}
-                                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${currentView === 'dashboard'
+                            </Link>
+                            <Link
+                                to="/dashboard"
+                                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${location.pathname === '/dashboard'
                                     ? 'bg-white text-indigo-600 shadow-sm'
                                     : 'text-slate-500 hover:text-slate-700'
                                     }`}
                             >
                                 Dashboard
-                            </button>
+                            </Link>
                         </nav>
 
                         {/* User Profile & Logout */}
