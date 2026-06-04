@@ -30,19 +30,20 @@ Dispo, ölçeklenebilirlik için modern, sunucusuz (serverless) bir mimari üzer
 
 ### Faz 1: Temel Özellikler (Tamamlandı ✅)
 - [x] Kayıt ekleme/silme/listeleme.
-- [x] Temel dashboard istatistikleri.
-- [x] Veri import/export.
+- [x] Temel dashboard istatistikleri (aylık trendler ve nedenler).
+- [x] Veri import/export (JSON yedekleme).
 
-### Faz 2: Güvenlik ve Çoklu Kullanıcı
-- [x] **Kimlik Doğrulama:** Apex ile ortak oturum entegrasyonu.
-- [x] **Rol Yönetimi:** Erişim kontrolü.
-- [ ] **Audit Logs:** Değişikliklerin takibi.
+### Faz 2: Standardizasyon, Doğrulama ve Yönlendirme (Tamamlandı ✅)
+- [x] **Kimlik Doğrulama:** Apex ile HttpOnly JWT tabanlı oturum doğrulaması (`verifyUser` entegrasyonu).
+- [x] **Yönlendirme:** `react-router-dom` entegrasyonu ile URL tabanlı `/` ve `/dashboard` rotaları.
+- [x] **Girdi Doğrulamaları:** Sunucu tarafında Zod şemaları ile veri bütünlüğü koruması.
+- [x] **Cinsiyet Standardizasyonu:** DB `sex` standardı ile arayüzdeki Türkçe gösterimin eşleşmesi.
 
-### Faz 3: Gelişmiş Raporlama
-- [ ] **PDF Raporlar:** Resmi formatta aylık döküm alma.
-- [ ] **Excel Export:** Özelleştirilebilir çıktılar.
-- [ ] **Bildirimler:** Aylık limit aşımlarında uyarı.
+> [!NOTE]
+> Faz 2 kapsamındaki Adım 5 geliştirmesi olan **Toplu Hayvan Girişi (Bulk Import API ve UI)** kullanıcı isteği üzerine geliştirilmemiş, kapsam dışı bırakılmıştır.
 
-### Faz 4: Mobil Deneyim
-- [ ] **PWA Desteği:** Mobil uyumlu kurulum.
-- [ ] **Offline Mod:** İnternetsiz çalışma desteği.
+### Faz 3: Gelişmiş Özellikler ve Entegrasyonlar (Planlanıyor)
+- [ ] Toplu Hayvan Girişi (Excel ve JSON formatından otomatik import).
+- [ ] PDF formatında resmi laboratuvar etik kurul hayvan kullanım raporu çıktı alabilme.
+- [ ] Locus (Kafes Konum) modülü ile canlı hayvan entegrasyonu.
+- [ ] Sistem üzerindeki veri değişikliklerinin audit log ile kayıt altına alınması.

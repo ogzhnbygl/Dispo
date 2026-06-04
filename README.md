@@ -13,15 +13,16 @@ Laboratuvar hayvanlarının kayıtlarını tutmak, izlemek ve raporlamak için g
 - **Arama ve Filtreleme:**
     - Tarih aralığına, türe, suşa veya proje koduna göre gelişmiş filtreleme.
     - Hızlı metin arama özelliği.
-- **Veri Yönetimi:**
-    - **Dışa Aktarma (Export):** Verileri JSON formatında yedekleme.
-    - **İçe Aktarma (Import):** Yedeklenen verileri sisteme geri yükleme.
-- **Güvenlik ve Yetkilendirme:**
-    - **Ortak Oturum:** Ana uygulama (Apex) ile entegre, paylaşılan güvenli oturum yönetimi.
-    - **Rol Tabanlı Erişim:** Sadece yetkili kullanıcıların ve yöneticilerin erişebildiği güvenli yapı.
+- **Güvenlik ve Yetkilendirme (Faz 1 & Faz 2):**
+    - **SSO Ortak Oturum:** Apex (wildtype.app) üzerinden paylaşılan güvenli `interapp_session` JWT çerezi ile tek noktadan oturum kontrolü.
+    - **React Router Yönlendirmesi:** `react-router-dom` entegrasyonu ile URL tabanlı yönlendirme (`/`, `/dashboard`).
+    - **Zod Giriş Validasyonu:** Backend tarafında tüm hayvan kayıt işlemleri Zod şemaları ile doğrulanarak veri bütünlüğü garanti altına alınmıştır.
+- **Cinsiyet Standardizasyonu:**
+    - Veritabanı seviyesinde `Male` ve `Female` İngilizce kodlama standartları korunurken, arayüzde Türkçe `Erkek` ve `Dişi` olarak eşlenip gösterilir.
 - **Modern Arayüz:**
     - Responsive tasarım ile mobil ve masaüstü uyumluluğu.
-    - Kullanıcı deneyimini artıran modern UI bileşenleri.
+    - Kullanıcı deneyimini artıran Recharts grafik görselleştirmeleri.
+    - JSON formatında veri yedekleme (Import/Export).
 
 ## 🛠️ Teknolojiler
 

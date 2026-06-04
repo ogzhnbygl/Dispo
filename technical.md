@@ -29,51 +29,62 @@ Dispo/
 └── package.json        # Konfigürasyon dosyaları
 ```
 
-## 🗄️ Veritabanı Şeması
+## 🗄️ Veritabanı Şeması & Veri Yapısı
 
-Uygulama tek bir ana koleksiyon kullanır: `animals`.
+Uygulama tek bir ana koleksiyon kullanır: `animals` (MongoDB).
 
 ### `animals` Koleksiyonu
-
 Her bir doküman aşağıdaki alanlara sahiptir:
 
 | Alan Adı | Tip | Açıklama |
 |---|---|---|
-| `_id` | ObjectId | MongoDB tarafından atanan benzersiz kimlik. |
-| `removalDate` | String | Hayvanın çıkarıldığı tarih (YYYY-MM-DD). |
-| `reason` | String | Çıkarılma nedeni kodu (örn: "EXP-01"). |
-| `count` | Number | Çıkarılan hayvan sayısı. |
-| `species` | String | Hayvan türü (örn: "Mouse", "Rat"). |
-| `strain` | String | Hayvan suşu (örn: "C57BL/6"). |
-| `gender` | String | Cinsiyet ("Male", "Female", "Unknown"). |
-| `project` | String | Proje kodu veya adı. |
-| `notes` | String | (Opsiyonel) Ek açıklamalar. |
-| `created_at` | Date | Kaydın oluşturulma zamanı. |
+| `_id` | ObjectId | MongoDB benzersiz kayıt kimliği |
+| `removalDate` | String | Hayvanın çıkarıldığı tarih (YYYY-MM-DD) |
+| `reason` | String | Çıkarılma nedeni kodu (örn: "EXP-01" vb.) |
+| `count` | Number | Çıkarılan hayvan sayısı |
+| `species` | String | Hayvan türü (örn: "Mouse", "Rat") |
+| `strain` | String | Hayvan suşu (örn: "C57BL/6") |
+| `sex` | String | Cinsiyet kodu (`Male`, `Female`) |
+| `dob` | String | Doğum Tarihi (YYYY-MM-DD) |
+| `project` | String | Proje kodu veya adı |
+| `transferInstitution` | String | Transfer yapılan kurum (Transfer nedenli çıkışlarda) |
+| `notes` | String | (Opsiyonel) Ek açıklamalar |
+| `created_at` | Date | Kaydın oluşturulma zamanı |
 
-## 🔌 API Referansı
+### ⚧ Cinsiyet ve İsim Standartları
+- **DB Standardı:** Veritabanında cinsiyet alanı `sex` ismiyle ve `Male` / `Female` değerleriyle saklanır. Zod şeması bu değerleri doğrular.
+- **UI Eşlemesi:** Arayüzde veri giriş formlarında ve listelerde bu değerler kullanıcıya Türkçe olarak `Erkek` ve `Dişi` şeklinde sunulur.
 
-Tüm API istekleri `/api` öneki ile başlar.
+---
 
-### 1. Kayıtları Getir
-- **Endpoint:** `GET /api/animals`
-- **Açıklama:** Tüm hayvan kayıtlarını, `removalDate`'e göre yeniden eskiye sıralı olarak getirir.
+## 🔌 API Referansı & Rotalar
 
-### 2. Yeni Kayıt Ekle
-- **Endpoint:** `POST /api/animals`
-- **Body:** JSON formatında kayıt bilgileri.
+### Ön Yüz Yönlendirmeleri (`react-router-dom`)
+- `/` - Dashboard / Grafik Analiz Ekranı
+- `/dashboard` - Hayvan Listesi, Arama ve Yeni Kayıt Ekleme Formu
 
-### 3. Kayıt Sil
-- **Endpoint:** `DELETE /api/animals?id={id}`
-- **Query Param:** `id` (Silinecek kaydın ID'si)
+### Sunucu API Endpoint'leri (Zod Validasyonlu)
 
-### 4. Dashboard İstatistikleri
-- **Endpoint:** `GET /api/dashboard-stats`
-- **Açıklama:** Dashboard grafikleri ve kartları için özet verileri hesaplar ve döner.
+Tüm API gövdeleri sunucu tarafında **Zod** şemaları aracılığıyla parse edilir. Safe parse işleminin alanları kırpmaması (parameter stripping) için formdaki tüm opsiyonel/zorunlu parametreler (`species`, `strain`, `sex`, `count`, `dob`, `removalDate`, `reason`, `project`, `transferInstitution`) Zod şemasına birebir dahil edilmiştir.
 
-## 🔐 Kimlik Doğrulama Mimarisi
+#### 1. Hayvan Kayıtları API (`/api/animals`)
+- **GET `/api/animals`**: Tüm hayvan kayıtlarını `removalDate`'e göre yeniden eskiye sıralı olarak getirir.
+- **POST `/api/animals`**: Yeni bir hayvan çıkışı kaydeder. Gönderilen veriler Zod ile doğrulanır (örn. `count` pozitif tam sayı olmalıdır).
+- **DELETE `/api/animals?id={id}`**: Belirtilen ID'ye sahip hayvan kaydını siler.
+
+#### 2. İstatistik API (`/api/dashboard-stats`)
+- **GET `/api/dashboard-stats`**: Dashboard grafiklerinin beslenmesi için aylık kullanım trendleri ve çıkış nedenleri dağılımını gruplayarak döner.
+
+> [!IMPORTANT]
+> **Toplu İçe Aktarma (Bulk Insert):** Faz 2 kapsamında planlanan `/api/animals/bulk` toplu veri aktarım ucu, kullanıcı kararı doğrultusunda geliştirilmemiş olup kapsam dışı tutulmuştur.
+
+---
+
+## 🔐 Kimlik Doğrulama ve Güvenlik
 
 Dispo, bağımsız bir kimlik doğrulama sistemi yerine ana uygulama olan **Apex (wildtype.app)** ile paylaşılan bir oturum yapısı kullanır.
 
-1.  **Giriş:** Kullanıcı `wildtype.app` üzerinden giriş yapar.
-2.  **Kontrol:** Dispo API, her istekte `interapp_session` çerezini doğrular.
-3.  **Yetkilendirme:** Sadece `apps` listesinde "Dispo" yetkisi olan kullanıcılar erişebilir.
+1.  **Oturum Kontrolü:** Dispo API'sine gelen her istekte `interapp_session` adlı signed JWT çerezi doğrulanır. Çerez geçersiz veya eksikse sunucu istekleri `401 Unauthorized` ile reddeder.
+2.  **Uygulama Yetkisi:** JWT içindeki `apps` dizisi kontrol edilir. Sadece "dispo" yetkisi verilmiş olan kullanıcılar sisteme erişebilir.
+3.  **Ön Yüz Koruma:** `App.jsx` üzerinde tanımlı React Router rotaları, Apex auth kütüphaneleri ile sarmalanarak yetkisiz kullanıcıların arayüze erişmesi engellenmiştir.
+
