@@ -56,26 +56,39 @@ export function DataTransfer({ records, onClose, onImportComplete }) {
         let successCount = 0;
         let errorCount = 0;
 
-        for (let i = 0; i < data.length; i++) {
-            const item = data[i];
-            try {
-                const cleanItem = {};
+        const cleanedItems = data.map((item) => {
+            const cleanItem = {};
+            if (item && typeof item === 'object') {
                 for (const key in item) {
+                    if (key === '_id' || key === 'id') continue;
                     if (typeof item[key] === 'string') {
                         cleanItem[key] = item[key].trim();
                     } else {
                         cleanItem[key] = item[key];
                     }
                 }
-                if (cleanItem.count) cleanItem.count = parseInt(cleanItem.count);
-
-                await db.animals.add(cleanItem);
-                successCount++;
-            } catch (e) {
-                console.error('Import error for item:', item, e);
-                errorCount++;
+                if (cleanItem.count !== undefined) {
+                    cleanItem.count = parseInt(cleanItem.count, 10);
+                }
             }
-            setProgress({ current: i + 1, total: data.length });
+            return cleanItem;
+        });
+
+        const CHUNK_SIZE = 500;
+        for (let offset = 0; offset < cleanedItems.length; offset += CHUNK_SIZE) {
+            const chunk = cleanedItems.slice(offset, offset + CHUNK_SIZE);
+            try {
+                const result = await db.animals.bulkAdd(chunk);
+                successCount += result.insertedCount || 0;
+                errorCount += result.errorCount || 0;
+            } catch (e) {
+                console.error('Bulk import error for chunk:', e);
+                errorCount += chunk.length;
+            }
+            setProgress({
+                current: Math.min(offset + chunk.length, cleanedItems.length),
+                total: cleanedItems.length
+            });
         }
 
         setLoading(false);

@@ -39,6 +39,7 @@ function HomeView({ records, fetchRecords, stats, filteredRecords, searchQuery, 
                     {/* Records List */}
                     <RecordList
                         records={filteredRecords}
+                        searchQuery={searchQuery}
                         onSearch={setSearchQuery}
                         onDelete={fetchRecords}
                     />
@@ -82,12 +83,14 @@ function App() {
     // Filter records locally
     const filteredRecords = useMemo(() => {
         if (!searchQuery) return records;
-        const lowerQuery = searchQuery.toLowerCase();
+        const lowerQuery = searchQuery.toLowerCase().trim();
+        if (!lowerQuery) return records;
         return records.filter(item =>
-            item.species.toLowerCase().includes(lowerQuery) ||
-            item.strain.toLowerCase().includes(lowerQuery) ||
-            item.project.toLowerCase().includes(lowerQuery) ||
-            item.reason.toLowerCase().includes(lowerQuery)
+            (item.species || '').toLowerCase().includes(lowerQuery) ||
+            (item.strain || '').toLowerCase().includes(lowerQuery) ||
+            (item.project || '').toLowerCase().includes(lowerQuery) ||
+            (item.reason || '').toLowerCase().includes(lowerQuery) ||
+            (item.transferInstitution || '').toLowerCase().includes(lowerQuery)
         );
     }, [records, searchQuery]);
 
@@ -95,15 +98,32 @@ function App() {
     const stats = useMemo(() => {
         if (!records) return { total: 0, month: 0, project: 0 };
 
-        const currentMonth = new Date().getMonth();
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = now.getFullYear();
+
+        const isCurrentYearMonth = (dateStr) => {
+            if (!dateStr) return false;
+            const match = String(dateStr).match(/^(\d{4})-(\d{2})/);
+            if (match) {
+                return Number(match[1]) === currentYear && Number(match[2]) === currentMonth;
+            }
+            const parsed = new Date(dateStr);
+            return (
+                !Number.isNaN(parsed.getTime()) &&
+                parsed.getFullYear() === currentYear &&
+                parsed.getMonth() + 1 === currentMonth
+            );
+        };
+
         return {
-            total: records.reduce((sum, item) => sum + item.count, 0),
+            total: records.reduce((sum, item) => sum + (Number(item.count) || 0), 0),
             month: records
-                .filter(item => new Date(item.removalDate).getMonth() === currentMonth)
-                .reduce((sum, item) => sum + item.count, 0),
+                .filter(item => isCurrentYearMonth(item.removalDate))
+                .reduce((sum, item) => sum + (Number(item.count) || 0), 0),
             project: records
                 .filter(item => ['EXP-01', 'EXP-02', 'EXP-03', 'EXP-04', 'MORT-02', 'ADM-02'].includes(item.reason))
-                .reduce((sum, item) => sum + item.count, 0)
+                .reduce((sum, item) => sum + (Number(item.count) || 0), 0)
         };
     }, [records]);
 

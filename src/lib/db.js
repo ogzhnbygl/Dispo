@@ -24,6 +24,19 @@ export const db = {
             return await response.json();
         },
 
+        bulkAdd: async (records) => {
+            const response = await fetch('/api/animals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: records })
+            });
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+                throw new Error(error.error || 'Toplu içe aktarma başarısız oldu.');
+            }
+            return await response.json();
+        },
+
         delete: async (id) => {
             const response = await fetch(`/api/animals?id=${id}`, {
                 method: 'DELETE'

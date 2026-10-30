@@ -46,6 +46,44 @@ export default async function handler(req, res) {
 
         case 'POST':
             try {
+                const rawBatch = Array.isArray(req.body)
+                    ? req.body
+                    : Array.isArray(req.body?.items)
+                    ? req.body.items
+                    : null;
+
+                if (rawBatch) {
+                    if (rawBatch.length === 0) {
+                        return res.status(400).json({ error: 'İçe aktarılacak kayıt dizisi boş olamaz.' });
+                    }
+                    if (rawBatch.length > 2000) {
+                        return res.status(400).json({ error: 'Tek seferde en fazla 2000 kayıt aktarılabilir.' });
+                    }
+
+                    const validDocs = [];
+                    let errorCount = 0;
+
+                    for (const rawItem of rawBatch) {
+                        const parsed = animalPostSchema.safeParse(rawItem);
+                        if (parsed.success) {
+                            validDocs.push(parsed.data);
+                        } else {
+                            errorCount++;
+                        }
+                    }
+
+                    let insertedCount = 0;
+                    if (validDocs.length > 0) {
+                        const bulkRes = await collection.insertMany(validDocs, { ordered: false });
+                        insertedCount = bulkRes.insertedCount ?? validDocs.length;
+                    }
+
+                    return res.status(201).json({
+                        insertedCount,
+                        errorCount
+                    });
+                }
+
                 const validation = animalPostSchema.safeParse(req.body);
                 if (!validation.success) {
                     return res.status(400).json({

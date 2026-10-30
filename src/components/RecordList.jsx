@@ -3,7 +3,15 @@ import { Trash2, Search, ClipboardList, ChevronLeft, ChevronRight, Filter, X } f
 import { db } from '../lib/db';
 import { REMOVAL_REASONS, STRAINS } from '../lib/constants';
 
-export function RecordList({ records, onSearch, onDelete }) {
+const normalizeSex = (sex) => {
+    if (!sex) return '-';
+    const trimmed = String(sex).trim();
+    if (trimmed === 'Erkek' || trimmed.toLowerCase() === 'male') return 'Erkek';
+    if (trimmed === 'Dişi' || trimmed.toLowerCase() === 'female') return 'Dişi';
+    return trimmed;
+};
+
+export function RecordList({ records, searchQuery = '', onSearch, onDelete }) {
     const [filters, setFilters] = useState({
         date: '',
         species: '',
@@ -66,7 +74,12 @@ export function RecordList({ records, onSearch, onDelete }) {
 
     const formatDate = (dateStr) => {
         if (!dateStr) return '-';
-        return new Date(dateStr).toLocaleDateString('tr-TR');
+        const safeStr = typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)
+            ? `${dateStr}T00:00:00`
+            : dateStr;
+        const parsed = new Date(safeStr);
+        if (Number.isNaN(parsed.getTime())) return dateStr;
+        return parsed.toLocaleDateString('tr-TR');
     };
 
     const getReasonLabel = (code) => {
@@ -81,10 +94,11 @@ export function RecordList({ records, onSearch, onDelete }) {
     // Filter records
     const filteredRecords = useMemo(() => {
         return records.filter(item => {
+            const normalizedSex = normalizeSex(item.sex);
             const matchDate = !filters.date || item.removalDate === filters.date;
             const matchSpecies = !filters.species || item.species === filters.species;
             const matchStrain = !filters.strain || item.strain === filters.strain;
-            const matchSex = !filters.sex || item.sex === filters.sex;
+            const matchSex = !filters.sex || normalizedSex === filters.sex;
             // Exact match for reason code
             const matchReason = !filters.reason || item.reason === filters.reason;
 
@@ -147,8 +161,37 @@ export function RecordList({ records, onSearch, onDelete }) {
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+            <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h2 className="text-lg font-semibold text-slate-800">Kayıt Listesi ({filteredRecords.length})</h2>
+                {onSearch && (
+                    <search className="w-full sm:w-64">
+                        <label htmlFor="dispo-record-search" className="sr-only">
+                            Kayıtlarda ara (tür, ırk, proje veya neden kodu)
+                        </label>
+                        <div className="relative">
+                            <Search
+                                size={16}
+                                aria-hidden="true"
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                            />
+                            <input
+                                id="dispo-record-search"
+                                name="q"
+                                type="search"
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    onSearch(e.target.value);
+                                    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+                                }}
+                                placeholder="Tür, ırk, proje veya kod ara..."
+                                autoCorrect="off"
+                                autoCapitalize="off"
+                                spellCheck={false}
+                                className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                            />
+                        </div>
+                    </search>
+                )}
             </div>
 
             <div className="overflow-x-auto flex-1 min-h-[400px]">
@@ -281,12 +324,18 @@ export function RecordList({ records, onSearch, onDelete }) {
                                         <div className="text-xs text-slate-500 bg-slate-100 inline-block px-1.5 py-0.5 rounded mt-0.5">{item.strain}</div>
                                     </td>
                                     <td className="px-5 py-4">
-                                        <div className="text-slate-600 flex items-center gap-1">
-                                            <span className={item.sex === 'Erkek' ? 'text-blue-500' : 'text-pink-500'}>
-                                                {item.sex === 'Erkek' ? '♂' : '♀'}
-                                            </span>
-                                            {item.sex}
-                                        </div>
+                                        {(() => {
+                                            const sexLabel = normalizeSex(item.sex);
+                                            const isMale = sexLabel === 'Erkek';
+                                            return (
+                                                <div className="text-slate-600 flex items-center gap-1">
+                                                    <span className={isMale ? 'text-blue-500' : 'text-pink-500'} aria-hidden="true">
+                                                        {isMale ? '♂' : '♀'}
+                                                    </span>
+                                                    {sexLabel}
+                                                </div>
+                                            );
+                                        })()}
                                     </td>
                                     <td className="px-5 py-4 font-semibold text-slate-700">{item.count}</td>
                                     <td className="px-5 py-4">
