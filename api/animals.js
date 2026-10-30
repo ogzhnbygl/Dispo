@@ -1,6 +1,6 @@
 import clientPromise, { getDbName } from '../lib/mongodb.js';
 import { ObjectId } from 'mongodb';
-import { verifyAuth } from '../lib/auth.js';
+import { verifyAuthWithStatus } from '../lib/auth.js';
 import { z } from 'zod';
 
 const animalPostSchema = z.object({
@@ -20,9 +20,9 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    const user = await verifyAuth(req, 'dispo');
+    const { user, status, error } = await verifyAuthWithStatus(req, 'dispo');
     if (!user) {
-        return res.status(401).json({ error: 'Unauthorized' });
+        return res.status(status || 401).json({ error: error || 'Unauthorized' });
     }
 
     const client = await clientPromise;
@@ -48,7 +48,9 @@ export default async function handler(req, res) {
             try {
                 const validation = animalPostSchema.safeParse(req.body);
                 if (!validation.success) {
-                    return res.status(400).json({ error: validation.error.errors[0].message });
+                    return res.status(400).json({
+                        error: validation.error.issues?.[0]?.message || 'Geçersiz kayıt verisi.'
+                    });
                 }
                 const newAnimal = validation.data;
                 const result = await collection.insertOne(newAnimal);
@@ -61,8 +63,8 @@ export default async function handler(req, res) {
         case 'DELETE':
             try {
                 const { id } = req.query;
-                if (!id) {
-                    return res.status(400).json({ error: 'ID is required' });
+                if (!id || typeof id !== 'string' || !ObjectId.isValid(id)) {
+                    return res.status(400).json({ error: 'Geçerli bir kayıt ID gereklidir.' });
                 }
                 await collection.deleteOne({ _id: new ObjectId(id) });
                 res.status(200).json({ success: true });
