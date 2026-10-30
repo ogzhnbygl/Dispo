@@ -1,4 +1,4 @@
-import clientPromise from '../lib/mongodb.js';
+import clientPromise, { getDbName } from '../lib/mongodb.js';
 import { ObjectId } from 'mongodb';
 import { verifyAuth } from '../lib/auth.js';
 import { z } from 'zod';
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     }
 
     const client = await clientPromise;
-    const db = client.db('Dispo_db');
+    const db = client.db(getDbName('Dispo_db'));
     const collection = db.collection('animals');
 
     switch (req.method) {

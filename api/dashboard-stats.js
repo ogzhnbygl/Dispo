@@ -1,4 +1,4 @@
-import clientPromise from '../lib/mongodb.js';
+import clientPromise, { getDbName } from '../lib/mongodb.js';
 import { verifyAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
     try {
         const client = await clientPromise;
-        const db = client.db('Dispo_db');
+        const db = client.db(getDbName('Dispo_db'));
         const collection = db.collection('animals');
 
         const now = new Date();
